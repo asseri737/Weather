@@ -1,24 +1,62 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
+import './App.css';
+const api = {
+  key : "8060478a6664f7b9e043ac9a83b88b88",
+  base: "https://api.openweathermap.org/data/2.5/"
+
+}
 function App() {
+
+  const [query, setQuery] = useState('');
+  const [weather, setWeather] = useState({});
+
+  const search = evt => {
+    if (evt.key === "Enter") {
+      fetch(`${api.base}weather?q=${query}&units=metric&APPID=${api.key}`)
+        .then(res => res.json())
+        .then(result => {
+          setWeather(result);
+          setQuery('');
+          console.log(result);
+        });
+    }
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+
+    <div className={(typeof weather.main != "undefined") ? ((weather.weather[0].main === 'Clear') ? 'app warm' : 'app') : 'app'}>
+   <main>
+
+     <div className="search-box text-warning">
+
+       <input
+       type = "text"
+       className= "search-bar"
+       placeholder="enter a city..."
+       onChange={e => setQuery(e.target.value)}
+       value={query}
+       onKeyPress={search}
+       />
+     </div>
+
+     {(typeof weather.main !="undefined") ? (
+<div>
+
+<div className="location-box">
+<div className="location">{weather.name},{weather.sys.country}</div>
+
+<div className="date"></div>
+     </div>
+     <div className="weather-box">
+
+       <div className="temp">{Math.round(weather.main.temp)}°c </div>
+       <div className="weather">{weather.weather[0].main}</div>
+
+     </div>
+</div>
+     ) : ('')}
+   </main>
     </div>
   );
 }
